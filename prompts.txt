@@ -1,0 +1,276 @@
+
+AI Ajan İçin İteratif Prompt Dizisi — Personel Ekle/Düzenle Frontend (Excel Okumadan)
+=====================================================================================
+
+ÖNEMLİ NOT
+----------
+**tüm sekmeler ve alanlar aşağıda açıkça listelenmiştir**. 
+Bu listeyi değişmez kaynak olarak kullanarak formları ve sekmeleri oluştur. Her sekme, form içinde "tab" olarak yer alacaktır.
+
+
+
+Kurallar
+--------
+- Her sekme ayrı bir Bootstrap tab-pane olarak tanımlansın.
+- Her alan için uygun input type kullanılsın (yukarıdaki önerileri baz alın).
+- Zorunlu alanları `required` ile işaretleyin; label'ında `*` gösterin.
+- Tüm alanlarda `name` attribute'u Excel sütun adının **snake_case** veya **kebab-case** sürümü olsun.
+- Tarihler `YYYY-MM-DD`, para alanları `number step=0.01` formatında.
+- Telefon için pattern: `^[0-9 +()-]{7,20}$`
+- TC Kimlik için pattern: `^[0-9]{11}$`
+- Uzun metinler için `<textarea rows="3">`.
+- Select alanların seçenekleri BE'den dinamik olarak yüklensin (placeholder seçenekler koyun).
+
+Tasarım ve Teknoloji Zorunlulukları
+-----------------------------------
+- **Apple tarzı minimal tasarım**
+- **Inter font** (Google Fonts)
+- **Bootstrap 5** yapısı
+- **toastr** ile tüm responselar
+- Sayfa sadece **Personel Ekle** ve **Personel Düzenle** ekranlarını kapsar.
+
+BE İletişimi (JS Kütüphanesi)
+-----------------------------
+- Öneri: **ky** (fetch tabanlı, küçük boyut)
+  - `const api = ky.create({{ prefixUrl: '/api', headers: {{ 'Content-Type': 'application/json' }} }});`
+  - `createPersonnel(data)` → `POST /personnel`
+  - `updatePersonnel(id, data)` → `PUT /personnel/{{id}}`
+  - `getPersonnelById(id)` → `GET /personnel/{{id}}`
+- Alternatif: **Axios**
+
+İteratif Prompt 1 — İskelet
+---------------------------
+1) `index.html` (CDN: Bootstrap, Inter, Toastr)
+2) `assets/css/app.css` (Apple-vari spacing, radius, shadows)
+3) `assets/js/apiClient.js` (ky ile temel CRUD)
+4) `assets/js/form.js` (form bağlama, validasyon, tablar, toastr)
+5) `assets/js/main.js` (mode: ekle/düzenle; ?id=… desteği)
+
+İteratif Prompt 2 — Form ve Validasyon
+--------------------------------------
+- Sekme/alan listesini **aynen** uygula.
+- Bootstrap grid ile 1–2 kolon düzeni; mobilde tek kolon.
+- Native validation + invalid-feedback.
+- Submit akışı: buton disable + spinner + toastr success/error.
+
+İteratif Prompt 3 — Entegrasyon ve Edge Durumları
+-------------------------------------------------
+- getPersonnelById ile mevcut kayıt doldurma (düzenle modu).
+- Ağ/timeout/4xx/5xx hatalarını merkezi yakala ve toastr ile göster.
+- Boş/Geçersiz `id` geldiyse formu kilitle ve uyarı ver.
+- Başarıda 1.5 sn sonra yönlendirme (opsiyon).
+
+Teslimat
+--------
+- `index.html`, `assets/css/app.css`, `assets/js/apiClient.js`, `assets/js/form.js`, `assets/js/main.js`
+- Tüm alanlar ve sekmeler oluşturulmuş olmalı.
+- README notu: .env ile BE base URL ayarı ve çalıştırma adımları.
+
+EK BÖLÜM — Sekmeler ve Alanlar (Sabit Liste, Excel Okumadan)
+============================================================
+
+Aşağıdaki sekmeler (Bootstrap tabs) ve alanlar, etiketler ve uygun input type/validasyon önerileriyle birlikte sabit olarak verilmiştir. Agent bu listeyi doğrudan uygulamalıdır.
+
+NOTASYON:
+- (Z) = Zorunlu alan
+- Koşullu = İlgili seçim/şarta bağlı olarak gösterilecek alan
+- repeatable group = birden fazla kayıt eklenebilen grup
+
+1) Kimlik ve İletişim
+---------------------
+- personel_sicil_no — text (Z), pattern: ^[A-Za-z0-9-_]{3,32}$
+- kimlik_seri_no — text
+- ad_soyad — text (Z), min 2 kelime
+- onceki_soyad — text
+- yaka_tipi — select (Z) [Beyaz, Mavi, Diğer]
+- tc_veya_uyruk — group
+  - tc_kimlik_no — text (Koşullu: uyruk=TR), pattern: ^[0-9]{11}$
+  - uyruk — select (Z)
+- dogum_yeri — text (Z)
+- dogum_tarihi — date (Z), min=1900-01-01, max=bugün
+- cinsiyet — select/radio
+- medeni_durum — select
+  - es_bilgileri — textarea (Koşullu: evli)
+  - cocuk_bilgileri — textarea (Koşullu: çocuk varsa)
+- foto — file (image/*), max 5MB
+- ikamet_adresi — textarea (Z)
+- gecici_adres — textarea
+- kisisel_tel — tel (Z), pattern: ^[0-9 +()-]{7,20}$
+- kisisel_eposta — email (Z)
+- acil_durum_kisileri — repeatable group
+  - ad_soyad — text (Z)
+  - iliski — text/select
+  - telefon — tel (Z), pattern yukarıdaki gibidir
+- ana_adi — text
+- baba_adi — text
+
+2) Yasal ve Uyumluluk
+---------------------
+- kvkk_aydinlatma_onay — checkbox (Z) [Aydınlatma metni linki]
+- acik_riza_gerekli_mi — switch
+  - acik_riza_kaydi — file veya checkbox+timestamp (Koşullu)
+- calisma_ikamet_izni_durumu — select (Koşullu: uyruk≠TR) [Var/Yok]
+  - calisma_izni_belgesi — file (Koşullu)
+  - ikamet_izni_belgesi — file (Koşullu)
+- nufus_belgesi — file
+- adli_sicil_gerekli_mi — switch (Koşullu: mevzuat/pozisyon)
+  - adli_sicil_belgesi — file (Koşullu)
+- ehliyet_sinifi — select (Koşullu: sürücü) [B, C, CE, D, vb.]
+  - src_belgesi — file (Koşullu)
+  - psikoteknik_belgesi — file (Koşullu)
+- engellilik_durumu — select
+  - engellilik_orani — number (0–100), step 1 (Koşullu)
+  - engellilik_belgesi — file (Koşullu)
+- emeklilik_durumu — select
+
+3) Eğitim ve Yeterlilik
+-----------------------
+- egitim_durumu — repeatable group
+  - okul — text (Z)
+  - bolum — text
+  - mezuniyet_yili — number (1900–yıl)
+- sertifikalar — repeatable group
+  - belge_adi — text
+  - kurum — text
+  - tarih — date
+  - belge_dosyasi — file
+- yabanci_diller — repeatable group
+  - dil — select/text
+  - seviye — select (A1–C2 veya Başlangıç–İleri)
+- referanslar — repeatable group
+  - ad_soyad — text
+  - iletisim — tel/email
+- gecmis_is_tecrubesi — repeatable group
+  - firma_adi — text
+  - pozisyon — text
+  - baslangic — month/date
+  - bitis — month/date (boş=devam)
+  - ic_disi — select (Şirket içi/Şirket dışı)
+  - ayrinti_dosya — file
+
+4) İşe Alım ve Sözleşmeler
+--------------------------
+- is_basvuru_formu — file (Z) veya form referansı
+- ozgecmis — file
+- ise_giris_tarihi — date (Z)
+- pozisyon — text/select (Z)
+- unvan — text/select (Z)
+- bolum — select (Z)
+- is_sozlesmesi_tipi — select (Z) [Belirli/Belirsiz/Tam/Yarı/Uzaktan/Hibrit]
+- ek_protokoller — checkbox group [Gizlilik, Rekabet, Bağlılık, Fikri Haklar, Zimmet...]
+- is_tanimi_dokumani — file (Z, güncel)
+- kidem — select/number
+- derece — select/number
+
+5) SGK, Vergi ve Banka
+----------------------
+- sgk_sicil_no — text (Z)
+- ise_giris_bildirimi — file
+- isten_cikis_bilgileri — group (düzenle modunda)
+- yeniden_giris_bilgileri — group (düzenle modunda)
+- iban — text (Z), pattern: ^TR[0-9A-Z]{24}$
+- banka_adi — select/text (Z)
+- bes_durumu — select (Z) [Otomatik katılım/Çıkış]
+  - bes_firmasi — select/text (Koşullu: katılım)
+- aile_durumu_bildirimi — file veya checkbox+timestamp
+
+6) Ücret ve Yan Haklar
+----------------------
+- ucret_tipi — select (Z) [Brüt/Net]
+- ucret_tutari — number (Z), step 0.01, min 0
+- odeme_periyodu — select (Z)
+- ek_odeme_politikalari — checkbox group [Prim, İkramiye, Vardiya, Fazla Mesai]
+- yan_haklar — checkbox group [Yemek, Yol, Akaryakıt, Özel Sağlık, Hayat Sigortası, Şirket Hattı...]
+  - yan_hak_detay_dosyasi — file
+- ucret_zam_gecmisi — repeatable group (düzenle ağırlıklı)
+  - tarih — date
+  - eski_ucret — number
+  - yeni_ucret — number
+  - onay_kaydi — file
+- avans_alir — switch
+  - avans_limit — number, step 0.01 (Koşullu)
+  - avans_politika_dosyasi — file (Koşullu)
+
+7) Çalışma Süreleri ve İzinler
+------------------------------
+- puantaj_takibi — info (liste ekranına referans)
+- vardiya_plani_var — switch
+  - vardiya_sablonu — select/file (Koşullu)
+- izin_hakedis_parametreleri — group
+  - yillik_izin_gun — number, min 0
+  - mazeret_izinleri — textarea
+  - diger_izin_tanimlari — textarea
+
+8) Performans, Gelişim ve Disiplin
+----------------------------------
+- hedef_seti — textarea/file
+- performans_degerlendirmeleri — repeatable group
+  - donem — select/month
+  - puan — number (0–100)
+  - form_dosyasi — file
+- egitim_plani — textarea/file
+- egitim_katilim_sertifikalari — repeatable file
+- geribildirim_notlari — textarea
+- disiplin_kaydi_var — switch
+  - uyari_ihtar_dosyasi — file (Koşullu)
+  - savunma_dosyasi — file (Koşullu)
+  - kurul_karari — file (Koşullu)
+
+9) İSG ve Sağlık
+----------------
+- ise_giris_saglik_raporu — file (Z – mevzuata göre)
+- periyodik_muayene_raporlari — repeatable file
+- isg_egitim_kayitlari — repeatable file (Z – pozisyona göre)
+- kkd_zimmetleri — repeatable group
+  - kkd_adi — text
+  - tarih — date
+  - zimmet_formu — file
+- risk_bilgilendirme_dosyasi — file
+- is_kazasi_meslek_hastaligi — switch
+  - olay_kayitlari — repeatable file (Koşullu)
+
+10) Varlık ve Erişim Yönetimi
+-----------------------------
+- demirbas_zimmetleri — repeatable group
+  - varlik_tipi — select [Dizüstü, Telefon, Kart, Anahtar, Araç, Ekipman...]
+  - marka_model — text
+  - seri_no — text
+  - teslim_tarihi — date
+  - iade_tarihi — date
+  - zimmet_formu — file
+- yazilim_hesap_erisimi — repeatable group
+  - sistem_adi — text/select [E-posta, ERP, CRM...]
+  - rol_yetki — text/select
+  - aktif_mi — switch
+- veri_guvenligi_taahhutleri — file/checkbox (Z - gerekiyorsa)
+- log_denetim_izleri — info
+
+11) Belge ve Süreç Yönetimi
+---------------------------
+- evrak_teslim_kayitlari — repeatable file
+- e_imza_onaylari — repeatable file/checkbox+timestamp
+- politika_prosedur_onaylari — checkbox group + file link [KVKK, İSG, Etik, Uzak çalışma...]
+- isten_ayrilis_evraklari — group (Koşullu: ayrılış süreci)
+  - fesih_bildirimi — file
+  - cikis_mulakati_formu — file
+  - ibraname — file
+  - zimmet_iade_formu — file
+  - kidem_ihbar_hesap_ozeti — file
+- saklama_suresi_imha_plani — select/file (Z - belge bazlı kural)
+
+12) Departman Görev
+-------------------
+- gorev_tanimlari — textarea/file (departman bazlı)
+- gelen_gorsele_gore — textarea/file (gelen görsele göre)
+
+Ortak Kurallar ve Davranışlar
+-----------------------------
+- Inter + Bootstrap 5 + Toastr zorunlu.
+- Validasyon: Native + Bootstrap invalid-feedback.
+- Maske/Pattern:
+  - Tel: ^[0-9 +()-]{7,20}$
+  - TC: ^[0-9]{11}$
+  - IBAN(TR): ^TR[0-9A-Z]{24}$
+- Koşullu alanları JS ile göster/gizle (form.js).
+- Kaydet akışı: buton disable + spinner; başarı/başarısızlık için toastr.
+- Özel nitelikli veriler (sağlık/adli/engellilik) rol tabanlı erişim ile sınırlandırılmalı.

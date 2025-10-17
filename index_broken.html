@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İK Yönetim Sistemi</title>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="hr-system">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <h5 class="mb-0 fw-600 text-primary">İK Sistemi</h5>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-page="personnel-list">
+                        <i class="bi bi-people me-2"></i>
+                        Personel Listesi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="reports">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Raporlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="settings">
+                        <i class="bi bi-gear me-2"></i>
+                        Ayarlar
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="company-selector">
+                <label for="company-select" class="form-label small text-muted">Şirket</label>
+                <select class="form-select form-select-sm" id="company-select">
+                    <option value="1">ABC Teknoloji A.Ş.</option>
+                    <option value="2">XYZ İnşaat Ltd.</option>
+                    <option value="3">DEF Danışmanlık</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="d-flex align-items-center justify-content-between w-100">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link text-dark me-3" id="sidebar-toggle">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div>
+                    <h5 class="mb-0 fw-600" id="page-title">Personel Listesi</h5>
+                    <small class="text-muted" id="page-subtitle">Tüm personelleri görüntüleyin ve yönetin</small>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-light text-dark px-3 py-2">
+                    <i class="bi bi-person-plus me-1"></i>
+                    <span id="mode-indicator">Ekleme Modu</span>
+                </span>
+                
+                <!-- Notifications -->
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark position-relative" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            3
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Bildirimler</h6></li>
+                        <li><a class="dropdown-item" href="#">Yeni personel başvurusu</a></li>
+                        <li><a class="dropdown-item" href="#">İzin talebi onayı bekliyor</a></li>
+                        <li><a class="dropdown-item" href="#">Sağlık raporu süresi dolacak</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center" href="#">Tümünü Gör</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Profile -->
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <div class="avatar me-2">
+                            <i class="bi bi-person-circle fs-4"></i>
+                        </div>
+                        <span class="d-none d-md-inline">Admin</span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profil Ayarları</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Çıkış</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Personnel Form Page -->
+        <div class="page-content" id="personnel-form-page">
+            <div class="row h-100">
+                <!-- Form Content -->
+                <div class="col-lg-9">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <form id="personnel-form" novalidate>
+                                <!-- Tab Content -->
+                                <div class="tab-content" id="personnel-tab-content">
+                                    <!-- 1. Kimlik ve İletişim -->
+                                    <div class="tab-pane fade show active" id="identity" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="personel_sicil_no" class="form-label">Personel Sicil No *</label>
+                                                <input type="text" class="form-control" id="personel_sicil_no" name="personel_sicil_no" 
+                                                       pattern="^[A-Za-z0-9-_]{3,32}$" required>
+                                                <div class="invalid-feedback">3-32 karakter arası sicil numarası giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="ad_soyad" class="form-label">Ad Soyad *</label>
+                                                <input type="text" class="form-control" id="ad_soyad" name="ad_soyad" required>
+                                                <div class="invalid-feedback">Ad soyad giriniz</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="yaka_tipi" class="form-label">Yaka Tipi *</label>
+                                                <select class="form-select" id="yaka_tipi" name="yaka_tipi" required>
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Beyaz">Beyaz</option>
+                                                    <option value="Mavi">Mavi</option>
+                                                    <option value="Diğer">Diğer</option>
+                                                </select>
+                                                <div class="invalid-feedback">Yaka tipi seçiniz</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="uyruk" class="form-label">Uyruk *</label>
+                                                <select class="form-select" id="uyruk" name="uyruk" required>
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="TR">Türkiye</option>
+                                                    <option value="US">Amerika</option>
+                                                    <option value="DE">Almanya</option>
+                                                    <option value="FR">Fransa</option>
+                                                    <option value="OTHER">Diğer</option>
+                                                </select>
+                                                <div class="invalid-feedback">Uyruk seçiniz</div>
+                                            </div>
+                                            <div class="col-md-4" id="tc_kimlik_group" style="display: none;">
+                                                <label for="tc_kimlik_no" class="form-label">TC Kimlik No *</label>
+                                                <input type="text" class="form-control" id="tc_kimlik_no" name="tc_kimlik_no" 
+                                                       pattern="^[0-9]{11}$" maxlength="11">
+                                                <div class="invalid-feedback">11 haneli TC kimlik numarası giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="dogum_yeri" class="form-label">Doğum Yeri *</label>
+                                                <input type="text" class="form-control" id="dogum_yeri" name="dogum_yeri" required>
+                                                <div class="invalid-feedback">Doğum yeri giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="dogum_tarihi" class="form-label">Doğum Tarihi *</label>
+                                                <input type="date" class="form-control" id="dogum_tarihi" name="dogum_tarihi" 
+                                                       min="1900-01-01" required>
+                                                <div class="invalid-feedback">Doğum tarihi seçiniz</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="cinsiyet" class="form-label">Cinsiyet</label>
+                                                <select class="form-select" id="cinsiyet" name="cinsiyet">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Erkek">Erkek</option>
+                                                    <option value="Kadın">Kadın</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="medeni_durum" class="form-label">Medeni Durum</label>
+                                                <select class="form-select" id="medeni_durum" name="medeni_durum">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Bekar">Bekar</option>
+                                                    <option value="Evli">Evli</option>
+                                                    <option value="Boşanmış">Boşanmış</option>
+                                                    <option value="Dul">Dul</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="foto" class="form-label">Fotoğraf</label>
+                                                <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
+                                            </div>
+                                            <div class="col-12" id="es_bilgileri_group" style="display: none;">
+                                                <label for="es_bilgileri" class="form-label">Eş Bilgileri</label>
+                                                <textarea class="form-control" id="es_bilgileri" name="es_bilgileri" rows="3"></textarea>
+                                            </div>
+                                            <div class="col-12" id="cocuk_bilgileri_group" style="display: none;">
+                                                <label for="cocuk_bilgileri" class="form-label">Çocuk Bilgileri</label>
+                                                <textarea class="form-control" id="cocuk_bilgileri" name="cocuk_bilgileri" rows="3"></textarea>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="ikamet_adresi" class="form-label">İkamet Adresi *</label>
+                                                <textarea class="form-control" id="ikamet_adresi" name="ikamet_adresi" rows="3" required></textarea>
+                                                <div class="invalid-feedback">İkamet adresi giriniz</div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="gecici_adres" class="form-label">Geçici Adres</label>
+                                                <textarea class="form-control" id="gecici_adres" name="gecici_adres" rows="3"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="kisisel_tel" class="form-label">Kişisel Telefon *</label>
+                                                <input type="tel" class="form-control" id="kisisel_tel" name="kisisel_tel" 
+                                                       pattern="^[0-9 +()-]{7,20}$" required>
+                                                <div class="invalid-feedback">Geçerli telefon numarası giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="kisisel_eposta" class="form-label">Kişisel E-posta *</label>
+                                                <input type="email" class="form-control" id="kisisel_eposta" name="kisisel_eposta" required>
+                                                <div class="invalid-feedback">Geçerli e-posta adresi giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="ana_adi" class="form-label">Ana Adı</label>
+                                                <input type="text" class="form-control" id="ana_adi" name="ana_adi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="baba_adi" class="form-label">Baba Adı</label>
+                                                <input type="text" class="form-control" id="baba_adi" name="baba_adi">
+                                            </div>
+                                            
+                                            <!-- Acil Durum Kişileri -->
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0">Acil Durum Kişileri</h6>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-emergency-contact">
+                                                        + Kişi Ekle
+                                                    </button>
+                                                </div>
+                                                <div id="emergency-contacts-container"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Yasal ve Uyumluluk -->
+                                    <div class="tab-pane fade" id="legal" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="kvkk_aydinlatma_onay" name="kvkk_aydinlatma_onay" required>
+                                                    <label class="form-check-label" for="kvkk_aydinlatma_onay">
+                                                        KVKK Aydınlatma Metni Onayı *
+                                                    </label>
+                                                    <div class="invalid-feedback">KVKK onayı zorunludur</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" id="acik_riza_gerekli_mi" name="acik_riza_gerekli_mi">
+                                                    <label class="form-check-label" for="acik_riza_gerekli_mi">Açık Rıza Gerekli Mi?</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" id="acik_riza_group" style="display: none;">
+                                                <label for="acik_riza_kaydi" class="form-label">Açık Rıza Kaydı</label>
+                                                <input type="file" class="form-control" id="acik_riza_kaydi" name="acik_riza_kaydi">
+                                            </div>
+                                            <div class="col-md-6" id="calisma_izni_group" style="display: none;">
+                                                <label for="calisma_ikamet_izni_durumu" class="form-label">Çalışma/İkamet İzni Durumu</label>
+                                                <select class="form-select" id="calisma_ikamet_izni_durumu" name="calisma_ikamet_izni_durumu">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Var">Var</option>
+                                                    <option value="Yok">Yok</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6" id="calisma_izni_belge_group" style="display: none;">
+                                                <label for="calisma_izni_belgesi" class="form-label">Çalışma İzni Belgesi</label>
+                                                <input type="file" class="form-control" id="calisma_izni_belgesi" name="calisma_izni_belgesi">
+                                            </div>
+                                            <div class="col-md-6" id="ikamet_izni_belge_group" style="display: none;">
+                                                <label for="ikamet_izni_belgesi" class="form-label">İkamet İzni Belgesi</label>
+                                                <input type="file" class="form-control" id="ikamet_izni_belgesi" name="ikamet_izni_belgesi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="nufus_belgesi" class="form-label">Nüfus Belgesi</label>
+                                                <input type="file" class="form-control" id="nufus_belgesi" name="nufus_belgesi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" id="adli_sicil_gerekli_mi" name="adli_sicil_gerekli_mi">
+                                                    <label class="form-check-label" for="adli_sicil_gerekli_mi">Adli Sicil Gerekli Mi?</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" id="adli_sicil_group" style="display: none;">
+                                                <label for="adli_sicil_belgesi" class="form-label">Adli Sicil Belgesi</label>
+                                                <input type="file" class="form-control" id="adli_sicil_belgesi" name="adli_sicil_belgesi">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="ehliyet_sinifi" class="form-label">Ehliyet Sınıfı</label>
+                                                <select class="form-select" id="ehliyet_sinifi" name="ehliyet_sinifi">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="B">B</option>
+                                                    <option value="C">C</option>
+                                                    <option value="CE">CE</option>
+                                                    <option value="D">D</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4" id="src_belgesi_group" style="display: none;">
+                                                <label for="src_belgesi" class="form-label">SRC Belgesi</label>
+                                                <input type="file" class="form-control" id="src_belgesi" name="src_belgesi">
+                                            </div>
+                                            <div class="col-md-4" id="psikoteknik_group" style="display: none;">
+                                                <label for="psikoteknik_belgesi" class="form-label">Psikoteknik Belgesi</label>
+                                                <input type="file" class="form-control" id="psikoteknik_belgesi" name="psikoteknik_belgesi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="engellilik_durumu" class="form-label">Engellilik Durumu</label>
+                                                <select class="form-select" id="engellilik_durumu" name="engellilik_durumu">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Yok">Yok</option>
+                                                    <option value="Var">Var</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3" id="engellilik_orani_group" style="display: none;">
+                                                <label for="engellilik_orani" class="form-label">Engellilik Oranı (%)</label>
+                                                <input type="number" class="form-control" id="engellilik_orani" name="engellilik_orani" min="0" max="100" step="1">
+                                            </div>
+                                            <div class="col-md-3" id="engellilik_belgesi_group" style="display: none;">
+                                                <label for="engellilik_belgesi" class="form-label">Engellilik Belgesi</label>
+                                                <input type="file" class="form-control" id="engellilik_belgesi" name="engellilik_belgesi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="emeklilik_durumu" class="form-label">Emeklilik Durumu</label>
+                                                <select class="form-select" id="emeklilik_durumu" name="emeklilik_durumu">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Emekli Değil">Emekli Değil</option>
+                                                    <option value="Emekli">Emekli</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Eğitim ve Yeterlilik -->
+                                    <div class="tab-pane fade" id="education" role="tabpanel">
+                                        <div class="row g-3">
+                                            <!-- Eğitim Durumu -->
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0">Eğitim Durumu</h6>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-education">
+                                                        + Eğitim Ekle
+                                                    </button>
+                                                </div>
+                                                <div id="education-container"></div>
+                                            </div>
+                                            
+                                            <!-- Sertifikalar -->
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0">Sertifikalar</h6>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-certificate">
+                                                        + Sertifika Ekle
+                                                    </button>
+                                                </div>
+                                                <div id="certificates-container"></div>
+                                            </div>
+                                            
+                                            <!-- Yabancı Diller -->
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0">Yabancı Diller</h6>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-language">
+                                                        + Dil Ekle
+                                                    </button>
+                                                </div>
+                                                <div id="languages-container"></div>
+                                            </div>
+                                            
+                                            <!-- Referanslar -->
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0">Referanslar</h6>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-reference">
+                                                        + Referans Ekle
+                                                    </button>
+                                                </div>
+                                                <div id="references-container"></div>
+                                            </div>
+                                            
+                                            <!-- Geçmiş İş Tecrübesi -->
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0">Geçmiş İş Tecrübesi</h6>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-experience">
+                                                        + Tecrübe Ekle
+                                                    </button>
+                                                </div>
+                                                <div id="experience-container"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. İşe Alım ve Sözleşmeler -->
+                    <div class="tab-pane fade" id="employment" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="is_basvuru_formu" class="form-label">İş Başvuru Formu *</label>
+                                <input type="file" class="form-control" id="is_basvuru_formu" name="is_basvuru_formu" required>
+                                <div class="invalid-feedback">İş başvuru formu zorunludur</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ozgecmis" class="form-label">Özgeçmiş</label>
+                                <input type="file" class="form-control" id="ozgecmis" name="ozgecmis">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ise_giris_tarihi" class="form-label">İşe Giriş Tarihi *</label>
+                                <input type="date" class="form-control" id="ise_giris_tarihi" name="ise_giris_tarihi" required>
+                                <div class="invalid-feedback">İşe giriş tarihi seçiniz</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pozisyon" class="form-label">Pozisyon *</label>
+                                <select class="form-select" id="pozisyon" name="pozisyon" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Müdür">Müdür</option>
+                                    <option value="Uzman">Uzman</option>
+                                    <option value="Memur">Memur</option>
+                                    <option value="İşçi">İşçi</option>
+                                </select>
+                                <div class="invalid-feedback">Pozisyon seçiniz</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="unvan" class="form-label">Ünvan *</label>
+                                <select class="form-select" id="unvan" name="unvan" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Genel Müdür">Genel Müdür</option>
+                                    <option value="Müdür">Müdür</option>
+                                    <option value="Şef">Şef</option>
+                                    <option value="Uzman">Uzman</option>
+                                </select>
+                                <div class="invalid-feedback">Ünvan seçiniz</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bolum" class="form-label">Bölüm *</label>
+                                <select class="form-select" id="bolum" name="bolum" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="İnsan Kaynakları">İnsan Kaynakları</option>
+                                    <option value="Muhasebe">Muhasebe</option>
+                                    <option value="Satış">Satış</option>
+                                    <option value="Pazarlama">Pazarlama</option>
+                                    <option value="IT">IT</option>
+                                </select>
+                                <div class="invalid-feedback">Bölüm seçiniz</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="is_sozlesmesi_tipi" class="form-label">İş Sözleşmesi Tipi *</label>
+                                <select class="form-select" id="is_sozlesmesi_tipi" name="is_sozlesmesi_tipi" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Belirli Süreli">Belirli Süreli</option>
+                                    <option value="Belirsiz Süreli">Belirsiz Süreli</option>
+                                    <option value="Tam Zamanlı">Tam Zamanlı</option>
+                                    <option value="Yarı Zamanlı">Yarı Zamanlı</option>
+                                    <option value="Uzaktan">Uzaktan</option>
+                                    <option value="Hibrit">Hibrit</option>
+                                </select>
+                                <div class="invalid-feedback">Sözleşme tipi seçiniz</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="is_tanimi_dokumani" class="form-label">İş Tanımı Dokümanı *</label>
+                                <input type="file" class="form-control" id="is_tanimi_dokumani" name="is_tanimi_dokumani" required>
+                                <div class="invalid-feedback">İş tanımı dokümanı zorunludur</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="kidem" class="form-label">Kıdem</label>
+                                <input type="number" class="form-control" id="kidem" name="kidem" min="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="derece" class="form-label">Derece</label>
+                                <input type="number" class="form-control" id="derece" name="derece" min="1">
+                            </div>
+                            
+                            <!-- Ek Protokoller -->
+                            <div class="col-12">
+                                <label class="form-label">Ek Protokoller</label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="gizlilik_protokolu" name="ek_protokoller[]" value="Gizlilik">
+                                            <label class="form-check-label" for="gizlilik_protokolu">Gizlilik Protokolü</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="rekabet_protokolu" name="ek_protokoller[]" value="Rekabet">
+                                            <label class="form-check-label" for="rekabet_protokolu">Rekabet Yasağı</label>
+                                            <div class="col-md-6">
+                                                <label for="sgk_sicil_no" class="form-label">SGK Sicil No</label>
+                                                <input type="text" class="form-control" id="sgk_sicil_no" name="sgk_sicil_no">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="iban" class="form-label">IBAN *</label>
+                                                <input type="text" class="form-control" id="iban" name="iban" pattern="^TR[0-9A-Z]{24}$" required>
+                                                <div class="invalid-feedback">Geçerli TR IBAN giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="banka_adi" class="form-label">Banka Adı</label>
+                                                <input type="text" class="form-control" id="banka_adi" name="banka_adi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="bes_durumu" class="form-label">BES Durumu</label>
+                                                <select class="form-select" id="bes_durumu" name="bes_durumu">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Otomatik Katılım">Otomatik Katılım</option>
+                                                    <option value="Gönüllü Katılım">Gönüllü Katılım</option>
+                                                    <option value="Katılım Yok">Katılım Yok</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 6. Ücret ve Yan Haklar -->
+                                    <div class="tab-pane fade" id="salary" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="ucret_tipi" class="form-label">Ücret Tipi *</label>
+                                                <select class="form-select" id="ucret_tipi" name="ucret_tipi" required>
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Sabit">Sabit</option>
+                                                    <option value="Değişken">Değişken</option>
+                                                    <option value="Komisyon">Komisyon</option>
+                                                </select>
+                                                <div class="invalid-feedback">Ücret tipi seçiniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="ucret_tutari" class="form-label">Ücret Tutarı *</label>
+                                                <input type="number" class="form-control" id="ucret_tutari" name="ucret_tutari" min="0" step="0.01" required>
+                                                <div class="invalid-feedback">Ücret tutarı giriniz</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="odeme_donemi" class="form-label">Ödeme Dönemi</label>
+                                                <select class="form-select" id="odeme_donemi" name="odeme_donemi">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="Aylık">Aylık</option>
+                                                    <option value="Haftalık">Haftalık</option>
+                                                    <option value="Günlük">Günlük</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 7. Çalışma Süreleri ve İzinler -->
+                                    <div class="tab-pane fade" id="schedule" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="alert alert-info">
+                                                    <i class="bi bi-info-circle me-2"></i>
+                                                    Puantaj sistemi entegrasyonu ile çalışma süreleri otomatik takip edilmektedir.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="yillik_izin_gun" class="form-label">Yıllık İzin Günü</label>
+                                                <input type="number" class="form-control" id="yillik_izin_gun" name="yillik_izin_gun" min="0" max="365">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="mazeret_izin" class="form-label">Mazeret İzinleri</label>
+                                                <textarea class="form-control" id="mazeret_izin" name="mazeret_izin" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 8. Performans, Gelişim ve Disiplin -->
+                                    <div class="tab-pane fade" id="performance" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="hedef_belirleme" class="form-label">Hedef Belirleme</label>
+                                                <textarea class="form-control" id="hedef_belirleme" name="hedef_belirleme" rows="4"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="performans_degerlendirme" class="form-label">Performans Değerlendirme</label>
+                                                <textarea class="form-control" id="performans_degerlendirme" name="performans_degerlendirme" rows="4"></textarea>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="geri_bildirim_notlari" class="form-label">Geri Bildirim Notları</label>
+                                                <textarea class="form-control" id="geri_bildirim_notlari" name="geri_bildirim_notlari" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 9. İSG ve Sağlık -->
+                                    <div class="tab-pane fade" id="health" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="giris_saglik_raporu" class="form-label">Giriş Sağlık Raporu</label>
+                                                <input type="file" class="form-control" id="giris_saglik_raporu" name="giris_saglik_raporu">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="isg_egitim_tarihi" class="form-label">İSG Eğitim Tarihi</label>
+                                                <input type="date" class="form-control" id="isg_egitim_tarihi" name="isg_egitim_tarihi">
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="risk_bilgileri" class="form-label">Risk Bilgileri</label>
+                                                <textarea class="form-control" id="risk_bilgileri" name="risk_bilgileri" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 10. Varlık ve Erişim Yönetimi -->
+                                    <div class="tab-pane fade" id="assets" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <h6 class="mb-3">Demirbaş Zimmetleri</h6>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="laptop_zimmet" class="form-label">Laptop/Bilgisayar</label>
+                                                <input type="text" class="form-control" id="laptop_zimmet" name="laptop_zimmet">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="telefon_zimmet" class="form-label">Telefon</label>
+                                                <input type="text" class="form-control" id="telefon_zimmet" name="telefon_zimmet">
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="veri_guvenlik_taahhut" class="form-label">Veri Güvenliği Taahhütnamesi</label>
+                                                <input type="file" class="form-control" id="veri_guvenlik_taahhut" name="veri_guvenlik_taahhut">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 11. Belge ve Süreç Yönetimi -->
+                                    <div class="tab-pane fade" id="documents" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <h6 class="mb-3">Politika Prosedür Onayları</h6>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="kvkk_politika_onay" name="politika_prosedur_onaylari[]" value="KVKK">
+                                                    <label class="form-check-label" for="kvkk_politika_onay">KVKK Politikası</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="isg_politika_onay" name="politika_prosedur_onaylari[]" value="İSG">
+                                                    <label class="form-check-label" for="isg_politika_onay">İSG Politikası</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="etik_politika_onay" name="politika_prosedur_onaylari[]" value="Etik">
+                                                    <label class="form-check-label" for="etik_politika_onay">Etik Politikası</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 12. Departman Görev -->
+                                    <div class="tab-pane fade" id="department" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="gorev_tanimlari" class="form-label">Görev Tanımları</label>
+                                                <textarea class="form-control" id="gorev_tanimlari" name="gorev_tanimlari" rows="6"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="departman_kodu" class="form-label">Departman Kodu</label>
+                                                <input type="text" class="form-control" id="departman_kodu" name="departman_kodu">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="rapor_verilen_kisi" class="form-label">Rapor Verilen Kişi</label>
+                                                <input type="text" class="form-control" id="rapor_verilen_kisi" name="rapor_verilen_kisi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="yonetilen_kisi_sayisi" class="form-label">Yönetilen Kişi Sayısı</label>
+                                                <input type="number" class="form-control" id="yonetilen_kisi_sayisi" name="yonetilen_kisi_sayisi" min="0">
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="alert alert-success">
+                                                    <strong>Tebrikler!</strong> Tüm personel bilgileri tamamlandı. Formu kaydetmek için "Kaydet" butonuna tıklayın.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Tabs Sidebar -->
+                <div class="col-lg-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Form Bölümleri</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="nav nav-pills flex-column" id="form-tabs" role="tablist">
+                                <button class="nav-link active text-start" id="identity-tab" data-bs-toggle="pill" data-bs-target="#identity" type="button" role="tab">
+                                    <i class="bi bi-person me-2"></i>
+                                    Kimlik ve İletişim
+                                </button>
+                                <button class="nav-link text-start" id="legal-tab" data-bs-toggle="pill" data-bs-target="#legal" type="button" role="tab">
+                                    <i class="bi bi-shield-check me-2"></i>
+                                    Yasal ve Uyumluluk
+                                </button>
+                                <button class="nav-link text-start" id="education-tab" data-bs-toggle="pill" data-bs-target="#education" type="button" role="tab">
+                                    <i class="bi bi-mortarboard me-2"></i>
+                                    Eğitim ve Yeterlilik
+                                </button>
+                                <button class="nav-link text-start" id="employment-tab" data-bs-toggle="pill" data-bs-target="#employment" type="button" role="tab">
+                                    <i class="bi bi-briefcase me-2"></i>
+                                    İşe Alım ve Sözleşmeler
+                                </button>
+                                <button class="nav-link text-start" id="sgk-tab" data-bs-toggle="pill" data-bs-target="#sgk" type="button" role="tab">
+                                    <i class="bi bi-bank me-2"></i>
+                                    SGK, Vergi ve Banka
+                                </button>
+                                <button class="nav-link text-start" id="salary-tab" data-bs-toggle="pill" data-bs-target="#salary" type="button" role="tab">
+                                    <i class="bi bi-currency-dollar me-2"></i>
+                                    Ücret ve Yan Haklar
+                                </button>
+                                <button class="nav-link text-start" id="schedule-tab" data-bs-toggle="pill" data-bs-target="#schedule" type="button" role="tab">
+                                    <i class="bi bi-calendar me-2"></i>
+                                    Çalışma Süreleri ve İzinler
+                                </button>
+                                <button class="nav-link text-start" id="performance-tab" data-bs-toggle="pill" data-bs-target="#performance" type="button" role="tab">
+                                    <i class="bi bi-graph-up me-2"></i>
+                                    Performans, Gelişim ve Disiplin
+                                </button>
+                                <button class="nav-link text-start" id="health-tab" data-bs-toggle="pill" data-bs-target="#health" type="button" role="tab">
+                                    <i class="bi bi-heart-pulse me-2"></i>
+                                    İSG ve Sağlık
+                                </button>
+                                <button class="nav-link text-start" id="assets-tab" data-bs-toggle="pill" data-bs-target="#assets" type="button" role="tab">
+                                    <i class="bi bi-laptop me-2"></i>
+                                    Varlık ve Erişim Yönetimi
+                                </button>
+                                <button class="nav-link text-start" id="documents-tab" data-bs-toggle="pill" data-bs-target="#documents" type="button" role="tab">
+                                    <i class="bi bi-file-text me-2"></i>
+                                    Belge ve Süreç Yönetimi
+                                </button>
+                                <button class="nav-link text-start" id="department-tab" data-bs-toggle="pill" data-bs-target="#department" type="button" role="tab">
+                                    <i class="bi bi-building me-2"></i>
+                                    Departman Görev
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Navigation -->
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="prev-tab" disabled>
+                                    <i class="bi bi-chevron-left me-1"></i>
+                                    Önceki
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="next-tab">
+                                    Sonraki
+                                    <i class="bi bi-chevron-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                <button type="button" class="btn btn-outline-secondary" id="cancel-btn">İptal</button>
+                <button type="submit" class="btn btn-primary" id="submit-btn" disabled>
+                    <span class="spinner-border spinner-border-sm me-2" role="status" style="display: none;"></span>
+                    Kaydet
+                </button>
+            </div>
+        </div>
+        
+        <!-- Personnel List Page -->
+        <div class="page-content active" id="personnel-list-page">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Personel Listesi</h5>
+                        <button class="btn btn-primary" data-page="personnel-form">
+                            <i class="bi bi-person-plus me-1"></i>
+                            Yeni Personel Ekle
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Sicil No</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Pozisyon</th>
+                                    <th>Departman</th>
+                                    <th>İşe Giriş</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>P001</td>
+                                    <td>Ahmet Yılmaz</td>
+                                    <td>Yazılım Geliştirici</td>
+                                    <td>IT</td>
+                                    <td>15.03.2023</td>
+                                    <td><span class="badge bg-success">Aktif</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                İşlemler
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#" onclick="editPersonnel(1)"><i class="bi bi-pencil me-2"></i>Düzenle</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>Görüntüle</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar-check me-2"></i>İzinler</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-receipt me-2"></i>Bordro</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history me-2"></i>Puantaj</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>P002</td>
+                                    <td>Ayşe Kaya</td>
+                                    <td>İK Uzmanı</td>
+                                    <td>İnsan Kaynakları</td>
+                                    <td>22.01.2023</td>
+                                    <td><span class="badge bg-success">Aktif</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                İşlemler
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#" onclick="editPersonnel(2)"><i class="bi bi-pencil me-2"></i>Düzenle</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>Görüntüle</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar-check me-2"></i>İzinler</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-receipt me-2"></i>Bordro</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history me-2"></i>Puantaj</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reports Page -->
+        <div class="page-content" id="reports-page">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Raporlar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-people fs-1 text-primary"></i>
+                                    <h5 class="mt-2">Personel Sayısı</h5>
+                                    <h3 class="text-primary">156</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-person-check fs-1 text-success"></i>
+                                    <h5 class="mt-2">Aktif Personel</h5>
+                                    <h3 class="text-success">142</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-calendar-x fs-1 text-warning"></i>
+                                    <h5 class="mt-2">İzinli Personel</h5>
+                                    <h3 class="text-warning">14</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Page -->
+        <div class="page-content" id="settings-page">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Sistem Ayarları</h5>
+                </div>
+                <div class="card-body">
+                    <p>Sistem ayarları burada yer alacak...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ky HTTP Client -->
+    <script src="https://unpkg.com/ky@1.2.3/distribution/index.js" type="module"></script>
+    
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="assets/js/apiClient.js"></script>
+    <script src="assets/js/form.js"></script>
+    <script src="assets/js/main.js"></script>
+    
+    <script>
+        // Page navigation
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetPage = e.currentTarget.getAttribute('data-page');
+                showPage(targetPage);
+            });
+        });
+        
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show target page
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'personnel-list': 'Personel Listesi',
+                'personnel-form': 'Personel Ekle',
+                'reports': 'Raporlar',
+                'settings': 'Ayarlar'
+            };
+            const subtitles = {
+                'personnel-list': 'Tüm personelleri görüntüleyin ve yönetin',
+                'personnel-form': 'Yeni personel bilgilerini ekleyin',
+                'reports': 'İstatistikler ve analizler',
+                'settings': 'Sistem ayarlarını yapılandırın'
+            };
+            document.getElementById('page-title').textContent = titles[pageId] || 'İK Sistemi';
+            document.getElementById('page-subtitle').textContent = subtitles[pageId] || '';
+        }
+        
+        // Sidebar toggle
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+        
+        // Edit personnel function
+        function editPersonnel(id) {
+            // Set edit mode
+            document.getElementById('mode-indicator').textContent = 'Düzenleme Modu';
+            document.getElementById('page-title').textContent = 'Personel Düzenle';
+            document.getElementById('page-subtitle').textContent = 'Personel bilgilerini güncelleyin';
+            
+            // Show form page
+            showPage('personnel-form');
+            
+            // Load personnel data (this would be implemented in form.js)
+            if (window.formManager) {
+                window.formManager.loadPersonnelData(id);
+            }
+        }
+        
+        // Tab navigation
+        let currentTabIndex = 0;
+        const tabs = document.querySelectorAll('#form-tabs .nav-link');
+        
+        document.getElementById('next-tab').addEventListener('click', () => {
+            if (currentTabIndex < tabs.length - 1) {
+                currentTabIndex++;
+                tabs[currentTabIndex].click();
+                updateTabNavigation();
+            }
+        });
+        
+        document.getElementById('prev-tab').addEventListener('click', () => {
+            if (currentTabIndex > 0) {
+                currentTabIndex--;
+                tabs[currentTabIndex].click();
+                updateTabNavigation();
+            }
+        });
+        
+        function updateTabNavigation() {
+            document.getElementById('prev-tab').disabled = currentTabIndex === 0;
+            document.getElementById('next-tab').disabled = currentTabIndex === tabs.length - 1;
+        }
+        
+        // Tab change handler
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                currentTabIndex = index;
+                updateTabNavigation();
+            });
+        });
+    </script>
+</body>
+</html>
