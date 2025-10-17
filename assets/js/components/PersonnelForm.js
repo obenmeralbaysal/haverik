@@ -8,6 +8,7 @@ class PersonnelForm extends Component {
             isEditMode: !!options.personnelId,
             personnelId: options.personnelId || null,
             formData: {},
+            emergencyContacts: [],
             tabs: [
                 { id: 'identity', name: 'Kimlik ve İletişim', icon: 'bi-person' },
                 { id: 'legal', name: 'Yasal ve Uyumluluk', icon: 'bi-shield-check' },
@@ -277,14 +278,99 @@ class PersonnelForm extends Component {
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="mb-0">Acil Durum İletişim Kişileri</h6>
                             <button type="button" class="btn btn-outline-primary btn-sm" id="add-emergency-contact">
-                                + Kişi Ekle
+                                <i class="bi bi-person-plus me-1"></i>
+                                Kişi Ekle
                             </button>
                         </div>
-                        <div id="emergency-contacts-container"></div>
+                        <div id="emergency-contacts-container">
+                            ${this.renderEmergencyContacts()}
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+    }
+    
+    renderEmergencyContacts() {
+        if (this.state.emergencyContacts.length === 0) {
+            return `
+                <div class="text-center py-3 text-muted">
+                    <i class="bi bi-person-plus fs-4"></i>
+                    <p class="mb-0 mt-2">Henüz acil durum kişisi eklenmemiş</p>
+                    <small>Yukarıdaki "Kişi Ekle" butonunu kullanarak ekleyebilirsiniz</small>
+                </div>
+            `;
+        }
+        
+        return this.state.emergencyContacts.map((contact, index) => `
+            <div class="emergency-contact-item border rounded p-3 mb-3 bg-light">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h6 class="mb-0">Acil Durum Kişisi ${index + 1}</h6>
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            onclick="window.personnelForm.removeEmergencyContact(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="emergency_name_${index}" class="form-label">Ad Soyad *</label>
+                        <input type="text" class="form-control" id="emergency_name_${index}" 
+                               name="emergency_contacts[${index}][name]" value="${contact.name || ''}" required>
+                        <div class="invalid-feedback">Ad soyad gereklidir</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="emergency_relation_${index}" class="form-label">İlişki *</label>
+                        <select class="form-select" id="emergency_relation_${index}" 
+                                name="emergency_contacts[${index}][relation]" required>
+                            <option value="">Seçiniz</option>
+                            <option value="Anne" ${contact.relation === 'Anne' ? 'selected' : ''}>Anne</option>
+                            <option value="Baba" ${contact.relation === 'Baba' ? 'selected' : ''}>Baba</option>
+                            <option value="Eş" ${contact.relation === 'Eş' ? 'selected' : ''}>Eş</option>
+                            <option value="Kardeş" ${contact.relation === 'Kardeş' ? 'selected' : ''}>Kardeş</option>
+                            <option value="Çocuk" ${contact.relation === 'Çocuk' ? 'selected' : ''}>Çocuk</option>
+                            <option value="Arkadaş" ${contact.relation === 'Arkadaş' ? 'selected' : ''}>Arkadaş</option>
+                            <option value="Diğer" ${contact.relation === 'Diğer' ? 'selected' : ''}>Diğer</option>
+                        </select>
+                        <div class="invalid-feedback">İlişki seçiniz</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="emergency_phone_${index}" class="form-label">Telefon *</label>
+                        <input type="tel" class="form-control" id="emergency_phone_${index}" 
+                               name="emergency_contacts[${index}][phone]" value="${contact.phone || ''}"
+                               pattern="^[0-9 +()-]{7,20}$" required>
+                        <div class="invalid-feedback">Geçerli bir telefon numarası giriniz</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="emergency_email_${index}" class="form-label">E-posta</label>
+                        <input type="email" class="form-control" id="emergency_email_${index}" 
+                               name="emergency_contacts[${index}][email]" value="${contact.email || ''}">
+                        <div class="invalid-feedback">Geçerli bir e-posta adresi giriniz</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    addEmergencyContact() {
+        const newContact = {
+            name: '',
+            relation: '',
+            phone: '',
+            email: ''
+        };
+        
+        this.setState({
+            emergencyContacts: [...this.state.emergencyContacts, newContact]
+        });
+    }
+    
+    removeEmergencyContact(index) {
+        const contacts = [...this.state.emergencyContacts];
+        contacts.splice(index, 1);
+        
+        this.setState({
+            emergencyContacts: contacts
+        });
     }
     
     renderLegalTab() {
@@ -1129,6 +1215,9 @@ class PersonnelForm extends Component {
     afterRender() {
         super.afterRender();
         this.bindEvents();
+        
+        // Global erişim için
+        window.personnelForm = this;
     }
     
     bindEvents() {
@@ -1181,6 +1270,14 @@ class PersonnelForm extends Component {
                 if (window.router) {
                     window.router.navigate('/personnel-list');
                 }
+            });
+        }
+        
+        // Acil durum kişisi ekleme
+        const addEmergencyBtn = this.$('#add-emergency-contact');
+        if (addEmergencyBtn) {
+            addEmergencyBtn.addEventListener('click', () => {
+                this.addEmergencyContact();
             });
         }
         
