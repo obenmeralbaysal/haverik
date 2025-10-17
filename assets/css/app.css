@@ -888,3 +888,23 @@ textarea.form-control {
     font-size: 0.9rem;
     color: var(--text-tertiary);
 }
+
+/* Sidebar "Yakında" Badge */
+.sidebar-nav .badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Hızlı Menü Dropdown */
+.dropdown-menu .dropdown-header {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}

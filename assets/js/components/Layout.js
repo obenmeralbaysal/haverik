@@ -37,9 +37,24 @@ class Layout extends Component {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-route="/personnel-form">
-                                <i class="bi bi-person-plus me-2"></i>
-                                Personel Ekle
+                            <a class="nav-link" href="#" data-route="/leave-management">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                İzin Yönetimi
+                                <span class="badge bg-secondary ms-auto">Yakında</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-route="/attendance">
+                                <i class="bi bi-clock me-2"></i>
+                                Puantaj İşlemleri
+                                <span class="badge bg-secondary ms-auto">Yakında</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-route="/payroll">
+                                <i class="bi bi-receipt me-2"></i>
+                                Bordro İşlemleri
+                                <span class="badge bg-secondary ms-auto">Yakında</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -60,7 +75,7 @@ class Layout extends Component {
                 <!-- Company Selector -->
                 <div class="sidebar-footer">
                     <div class="company-selector">
-                        <label class="form-label text-muted small mb-2">Şirket Seçimi</label>
+                        <label class="form-label text-muted small mb-2">Lokasyon Seçimi</label>
                         <select class="form-select form-select-sm" id="company-selector">
                             <option value="haver-main">Haver Beykoz</option>
                             <option value="haver-tech">Haver Trakya</option>
@@ -88,6 +103,35 @@ class Layout extends Component {
                     </div>
                     
                     <div class="d-flex align-items-center gap-3">
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-lightning me-1"></i>
+                                Hızlı Menü
+                                <i class="bi bi-chevron-down ms-1"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Excel İşlemleri</h6></li>
+                                <li><a class="dropdown-item" href="#" data-action="excel-entry">
+                                    <i class="bi bi-file-earmark-excel me-2 text-success"></i>
+                                    Excel İşe Giriş
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" data-action="excel-exit">
+                                    <i class="bi bi-file-earmark-excel me-2 text-danger"></i>
+                                    Excel İşten Çıkış
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Hızlı İşlemler</h6></li>
+                                <li><a class="dropdown-item" href="#" data-action="quick-entry">
+                                    <i class="bi bi-person-plus me-2 text-primary"></i>
+                                    Hızlı İşe Giriş
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" data-action="quick-exit">
+                                    <i class="bi bi-person-dash me-2 text-warning"></i>
+                                    Hızlı İşten Çıkış
+                                </a></li>
+                            </ul>
+                        </div>
+                        
                         <div class="dropdown">
                             <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-bell fs-5"></i>
@@ -189,6 +233,51 @@ class Layout extends Component {
         }));
     }
     
+    handleQuickAction(action) {
+        switch (action) {
+            case 'excel-entry':
+                this.showExcelEntryModal();
+                break;
+            case 'excel-exit':
+                this.showExcelExitModal();
+                break;
+            case 'quick-entry':
+                this.showQuickEntryModal();
+                break;
+            case 'quick-exit':
+                this.showQuickExitModal();
+                break;
+            default:
+                if (window.toastr) {
+                    toastr.info('Bu özellik yakında eklenecek');
+                }
+        }
+    }
+    
+    showExcelEntryModal() {
+        if (window.toastr) {
+            toastr.info('Excel İşe Giriş özelliği yakında eklenecek');
+        }
+    }
+    
+    showExcelExitModal() {
+        if (window.toastr) {
+            toastr.info('Excel İşten Çıkış özelliği yakında eklenecek');
+        }
+    }
+    
+    showQuickEntryModal() {
+        if (window.toastr) {
+            toastr.info('Hızlı İşe Giriş özelliği yakında eklenecek');
+        }
+    }
+    
+    showQuickExitModal() {
+        if (window.toastr) {
+            toastr.info('Hızlı İşten Çıkış özelliği yakında eklenecek');
+        }
+    }
+    
     bindEvents() {
         // Sidebar toggle
         const sidebarToggle = this.$('#sidebar-toggle');
@@ -214,6 +303,15 @@ class Layout extends Component {
                 if (window.router) {
                     window.router.navigate(route);
                 }
+            });
+        });
+        
+        // Hızlı menü actions
+        this.$$('[data-action]').forEach(actionLink => {
+            actionLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = actionLink.getAttribute('data-action');
+                this.handleQuickAction(action);
             });
         });
     }
